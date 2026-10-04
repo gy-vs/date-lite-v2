@@ -268,3 +268,30 @@ it('Year 1 formatted with YYYY should pad with zeroes', () => {
   expect(res.slice(0, 3)).toBe('000') // because of timezone, the result might be 0000 0001 or 0002
   expect(res).toBe(moment(date).format('YYYY'))
 })
+
+it('Format Year Y (single, not a token) stays a literal letter', () => {
+  // core format only defines YY and YYYY for years; a lone Y is not a token
+  // and must be output as-is, regardless of the machine timezone
+  const d = dayjs('2024-03-05 10:00:00')
+  expect(d.format('Y')).toBe('Y')
+  expect(d.format('Y-MM')).toBe('Y-03')
+  expect(d.format('YYYY[年]Q[季度]')).toBe('2024年Q季度')
+})
+
+it('Format Year runs of Y not in the token table fall back to YY/YYYY plus literals', () => {
+  // three/five Ys are not tokens: longest match is YY/YYYY, the rest stay literal
+  const d = dayjs('2024-03-05 10:00:00')
+  expect(d.format('YYY')).toBe('24Y')
+  expect(d.format('YYYYY')).toBe('2024Y')
+  expect(d.format('YYYYYY')).toBe('202424')
+  expect(d.format('YYMM')).toBe('2403')
+})
+
+it('Format unmatched Y tokens do not leak the timezone offset', () => {
+  // regression: format('Y') used to render '+0800'/'+0000' via the ZZ fallback
+  expect(dayjs('2024-03-05 10:00:00').format('Y')).not.toMatch(/[+-]\d{4}/)
+})
+
+it('Format escaped [Y] still outputs Y', () => {
+  expect(dayjs('2024-03-05 10:00:00').format('[Y]')).toBe('Y')
+})

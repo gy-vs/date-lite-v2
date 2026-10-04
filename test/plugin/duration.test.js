@@ -308,4 +308,23 @@ describe('Format', () => {
     expect(d.format('Y/YY.YYYYTESTM:MM:D:DD:H:HH:m:mm:s:ss:SSS'))
       .toBe('2/02.0002TEST9:09:6:06:8:08:5:05:1:01:010')
   })
+
+  it('Y / YY / YYYY year tokens', () => {
+    const d = dayjs.duration(2, 'years')
+    expect(d.format('Y')).toBe('2')
+    expect(d.format('YY')).toBe('02')
+    expect(d.format('YYYY')).toBe('0002')
+  })
+
+  it('YYY is not a token: it is YY followed by Y', () => {
+    expect(dayjs.duration(2, 'years').format('YYY')).toBe('022')
+    expect(dayjs.duration(12, 'years').format('YYY')).toBe('1212')
+    // five Ys: longest token YYYY, then a trailing Y token
+    expect(dayjs.duration(2, 'years').format('YYYYY')).toBe('00022')
+  })
+
+  it('unmatched year spellings do not render undefined', () => {
+    expect(dayjs.duration(2, 'years').format('YYY')).not.toContain('undefined')
+    expect(dayjs.duration(2, 'years').format('[Y]')).toBe('Y')
+  })
 })
