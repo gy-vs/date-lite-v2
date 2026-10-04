@@ -3,14 +3,17 @@ import {
   MILLISECONDS_A_HOUR,
   MILLISECONDS_A_MINUTE,
   MILLISECONDS_A_SECOND,
-  MILLISECONDS_A_WEEK,
-  REGEX_FORMAT
+  MILLISECONDS_A_WEEK
 } from '../../constant'
 
 const MILLISECONDS_A_YEAR = MILLISECONDS_A_DAY * 365
 const MILLISECONDS_A_MONTH = MILLISECONDS_A_YEAR / 12
 
 const durationRegex = /^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/
+
+// Duration token table has Y, YY and YYYY but not YYY: an unmatched
+// run of Ys must be read as the longest known tokens plus a literal Y.
+const REGEX_DURATION_FORMAT = /\[([^\]]+)]|YYYY|YY|Y|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g
 
 const unitToMS = {
   years: MILLISECONDS_A_YEAR,
@@ -182,7 +185,7 @@ class Duration {
       ss: $u.s(this.$d.seconds, 2, '0'),
       SSS: $u.s(this.$d.milliseconds, 3, '0')
     }
-    return str.replace(REGEX_FORMAT, (match, $1) => $1 || String(matches[match]))
+    return str.replace(REGEX_DURATION_FORMAT, (match, $1) => $1 || String(matches[match]))
   }
 
   as(unit) {

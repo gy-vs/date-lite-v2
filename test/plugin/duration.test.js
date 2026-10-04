@@ -308,4 +308,13 @@ describe('Format', () => {
     expect(d.format('Y/YY.YYYYTESTM:MM:D:DD:H:HH:m:mm:s:ss:SSS'))
       .toBe('2/02.0002TEST9:09:6:06:8:08:5:05:1:01:010')
   })
+
+  test('YYY is not a token: YY followed by a literal Y', () => {
+    const d = dayjs.duration(2, 'years')
+    expect(d.format('Y')).toBe('2')
+    expect(d.format('YY')).toBe('02')
+    expect(d.format('YYY')).toBe('022')
+    expect(d.format('YYYY')).toBe('0002')
+    expect(d.format('YYYYY')).toBe('00022')
+  })
 })

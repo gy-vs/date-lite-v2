@@ -26,6 +26,18 @@ it('Format Year YY YYYY', () => {
   expect(dayjs().format('YYYY')).toBe(moment().format('YYYY'))
 })
 
+it('Format lone Y is a literal, not a timezone offset', () => {
+  const d = dayjs('2024-03-05T10:00:00Z')
+  expect(d.format('Y')).toBe('Y')
+  expect(d.format('YYY')).toBe('24Y')
+  expect(d.format('YYYYY')).toBe('2024Y')
+  expect(d.format('Y-MM')).toBe('Y-03')
+  expect(d.format('[Y]')).toBe('Y')
+  // documented year tokens keep working
+  expect(d.format('YY')).toBe('24')
+  expect(d.format('YYYY')).toBe('2024')
+})
+
 it('Format Month M MM MMM MMMM', () => {
   expect(dayjs().format('M')).toBe(moment().format('M'))
   expect(dayjs().format('MM')).toBe(moment().format('MM'))
